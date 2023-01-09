@@ -1,0 +1,48 @@
+{% extends 'Base.html' %}
+{% block content %}
+    <div class="container">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="flip-container">
+                    <div id="flipper" class="flipper">
+                        <div class="cartao cartao-front">
+                            <div class="flex-area j-space-between a-items-center header-cartao a-items-start">
+                                <h3 style="white-space: nowrap">{{ card.owner.first_name }} {{ card.owner.last_name }}</h3>
+                            </div>
+                            <hr>
+                            <label>
+                                <span>Категория карты</span>
+                                <div class="input-area">
+                                    <p class="numero-do-cartao-front">{{ card.category }}</p>
+                                </div>
+                            </label>
+                            <hr>
+                            <label>
+                                <span>Номер карты</span>
+                                <div class="input-area">
+                                    <p class="numero-do-cartao-front">{{ card.number }}</p>
+                                </div>
+                            </label>
+                            <hr>
+                            <div class="flex-area j-space-between">
+                                <label class="w-48">
+                                    <span>Дата окончания срока</span>
+                                    <div class="input-area">
+                                        <p class="data-validade-cartao-front">{{ card.date_of_expiry }}</p>
+                                    </div>
+                                </label>
+                                <hr>
+                                <label class="w-48">
+                                    <span>CVV</span>
+                                    <div class="input-area">
+                                        <p class="cvv-front">{{ card.cvv }}</p>
+                                    </div>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
