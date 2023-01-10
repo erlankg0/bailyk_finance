@@ -1,48 +1,224 @@
 {% extends 'Base.html' %}
+{% load static %}
+{% static 'images/banners/banner.jpeg' %}
 {% block content %}
-    <div class="container">
-        <div class="row">
-            <div class="col-md-12">
-                <div class="flip-container">
-                    <div id="flipper" class="flipper">
-                        <div class="cartao cartao-front">
-                            <div class="flex-area j-space-between a-items-center header-cartao a-items-start">
-                                <h3 style="white-space: nowrap">{{ card.owner.first_name }} {{ card.owner.last_name }}</h3>
-                            </div>
-                            <hr>
-                            <label>
-                                <span>Категория карты</span>
-                                <div class="input-area">
-                                    <p class="numero-do-cartao-front">{{ card.category }}</p>
-                                </div>
-                            </label>
-                            <hr>
-                            <label>
-                                <span>Номер карты</span>
-                                <div class="input-area">
-                                    <p class="numero-do-cartao-front">{{ card.number }}</p>
-                                </div>
-                            </label>
-                            <hr>
-                            <div class="flex-area j-space-between">
-                                <label class="w-48">
-                                    <span>Дата окончания срока</span>
-                                    <div class="input-area">
-                                        <p class="data-validade-cartao-front">{{ card.date_of_expiry }}</p>
+    <section class="section-content padding-y bg">
+        <div class="container">
+            <!-- ============================ COMPONENT 1 ================================= -->
+            <div class="card">
+                <div class="row no-gutters">
+                    <aside class="col-md-6">
+                        <article class="content-body">
+
+                            <p class="mb-3">
+                                <strong>Имя:</strong>
+                                <input value="{{ card.owner.first_name }}" readonly class="form-control">
+                            </p>
+                            <p class="mb-3">
+                                <strong>Фамилия:</strong>
+                                <input value="{{ card.owner.last_name }}" readonly class="form-control">
+                            </p>
+                            <p class="mb-3">
+                                <strong>Номер карты:</strong>
+                                <input value="{{ card }}" readonly class="form-control">
+                            </p>
+                            <p class="mb-3">
+                                <strong>Баланс:</strong>
+                                <input type="number" value="{{ card.amount }}" class="form-control" readonly>
+                            </p>
+                            <p class="mb-3">
+                            <form class="d-none" method="post" id="add_balance" action="{% url 'add_amount' %}">
+                                {% csrf_token %}
+                                <strong>Пополнить баланс:</strong>
+                                <input name="card_id" value="{{ card.slug }}" hidden>
+                                <input type="number" name="amount" class="form-control">
+                                <br>
+                                <button type="submit" class="btn btn-primary " id="">Пополнить</button>
+                            </form>
+
+                            </p>
+                            <p class="mb-3">
+                                <strong>Дата окончания:</strong> {{ card.date_of_expiry }}
+                            </p>
+                            <form class="" method="post" action="{% url 'update_card' %}" id="update_card">
+                                {% csrf_token %}
+                                <input name="card_id" value="{{ card.slug }}" hidden>
+                                <div class="mb-3 d-none" id="choice_type_card">
+
+                                    <div class="item-option-select">
+                                        <h6>Изменить типа карты</h6>
+                                        <select class="form-control" name="card_type">
+                                            <option value="0" class="form-control">Выбор типа карты</option>
+                                            <option value="credit" class="form-control">Кредитная карта</option>
+                                            <option value="debit" class="form-control">Дебетовая карта</option>
+                                            <option value="bonus" class="form-control">Бонусная карта</option>
+                                        </select>
                                     </div>
-                                </label>
+                                </div>
+                                <div class="mb-3 d-none" id="select_status_card">
+                                    <div class="item-option-select">
+                                        <h6>Изменить статус карты</h6>
+                                        <select class="form-control" name="card_status">
+                                            <option value="0" class="form-control">Выбор статуса карты</option>
+                                            <option value="activated" class="form-control">Активирована</option>
+                                            <option value="not_activated" class="form-control">Не активирована</option>
+                                            <option value="expired" class="form-control">Заблокирована/Просрочена
+                                            </option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn btn-primary d-none" id="save_changes">Сохранить
+                                    изменения
+                                </button>
+                            </form>
+                            <p class="mb-3">
+                                {% if card.status == "activated" %}
+                                    <strong>Статус:</strong> Активирована
+                                {% elif card.status == "not_activated" %}
+                                    <strong>Статус:</strong> Не активирована
+                                {% else %}
+                                    <strong>Статус:</strong> Заблокирована/Просрочена
+                                {% endif %}
+                            </p>
+                            <form action="{% url 'delete_card' %}" method="post">
+                                {% csrf_token %}
+                                <input name="card_id" value="{{ card.slug }}" hidden>
+                                <button type="submit" class="btn btn-danger d-none" id="delete_card">Удалить карту
+                                </button>
+                            </form>
+                        </article>
+                    </aside>
+                    <div class="col-md-6 border-left">
+                        <form autocomplete="off">
+                            <article class="content-body">
+                                {% if card.card_category == "credit" %}
+                                    <h3 class="title">Тип карты: Кредитная карта </h3>
+                                {% elif card.card_category == "debit" %}
+                                    <h3 class="title">Тип карты: Дебетовая карта </h3>
+                                {% else %}
+                                    <h3 class="title">Тип карты: Бонусная карта </h3>
+                                {% endif %}
+
+                                <div class="item-option-select">
+                                    <h6>Операции с картой</h6>
+                                    <select class="form-control" id="select_operation">
+                                        <option value="0" class="form-control">Выбор операции</option>
+                                        <option value="2" class="form-control">Редактирования карты.</option>
+                                        <option value="3" class="form-control">Удаления карты.</option>
+                                        <option value="4" class="form-control">Пополнения балланса.</option>
+                                    </select>
+                                </div>
+                                <a type="button" href="{% url 'create_card' card.owner.id %}">
+                                    <i class="fa fa-credit-card"></i> Добавить новую карту
+                                </a>
                                 <hr>
-                                <label class="w-48">
-                                    <span>CVV</span>
-                                    <div class="input-area">
-                                        <p class="cvv-front">{{ card.cvv }}</p>
-                                    </div>
-                                </label>
+                            </article> <!-- product-info-aside .// -->
+                        </form>
+                    </div><!-- col.// -->
+                </div> <!-- row.// -->
+            </div> <!-- card.// -->
+            <!-- ============================ COMPONENT 1 END .// ================================= -->
+
+            <br>
+
+
+            <div class="row d-none">
+                <div class="col-md-9">
+
+                    <header class="section-heading">
+                        <h3>Customer Reviews </h3>
+
+                    </header>
+
+                    <article class="box mb-3">
+                        <div class="icontext w-100">
+                            <img src="" class="img-xs icon rounded-circle">
+                            <div class="text">
+                                <span class="date text-muted float-md-right">24.04.2020 </span>
+                                <h6 class="mb-1">Mike John </h6>
+
                             </div>
+                        </div> <!-- icontext.// -->
+                        <div class="mt-3">
+                            <p>
+                                Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
+                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
+                                quis nostrud exercitation ullamco laboris nisi ut aliquip
+                            </p>
                         </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                    </article>
+
+
+                </div> <!-- col.// -->
+            </div> <!-- row.// -->
+
+
+        </div> <!-- container .//  -->
+    </section>
+    <!-- ========================= SECTION CONTENT END// ========================= -->
+    <script>
+        $('#PAYMENT_SYSTEM').change(function () {
+            var payment_system = $(this).val();
+            // генерируем номер карты в зависимости от платежной системы и добавляем в поле card_number
+            if (payment_system == 'visa') {
+                var card_number = '4' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 4
+                $('input[name="number"]').val(card_number);
+            } else if (payment_system == 'mastercard') {
+                var card_number = '5' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 5
+                $('input[name="number"]').val(card_number);
+            } else if (payment_system == 'american_express') {
+                var card_number = '3' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 3
+                $('input[name="number"]').val(card_number);
+            } else if (payment_system == 'mir') {
+                var card_number = '2' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 2
+                $('input[name="number"]').val(card_number);
+            }
+        });
+        $('#id_cart_category').change(function () {
+            var cart_category = $(this).val();
+            if (cart_category == 'bonus') {
+                $('#PAYMENT_SYSTEM').addClass('d-none');
+                var card_number = Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число
+                $('input[name="number"]').val(card_number);
+                $('input[name="cvv"]').addClass('d-none');
+                $('label[for="id_cvv"]').addClass('d-none');
+            } else {
+                $('#PAYMENT_SYSTEM').removeClass('d-none');
+                $('input[name="cvv"]').removeClass('d-none');
+                $('label[for="id_cvv"]').removeClass('d-none');
+                var cvv = Math.floor(Math.random() * 1000); // генерируем 3-значное число
+                $('input[name="cvv"]').val(cvv);
+                var pin = Math.floor(Math.random() * 10000); // генерируем 4-значное число
+                $('input[name="pin"]').val(pin);
+            }
+        });
+        $('#select_operation').change(function () {
+            var operation = $(this).val();
+            if (operation == '2') {
+                $('#choice_type_card').removeClass('d-none');
+                $('#select_status_card').removeClass('d-none');
+                $('#save_changes').removeClass('d-none');
+            } else {
+                $('#choice_type_card').addClass('d-none');
+                $('#select_status_card').addClass('d-none');
+                $('#save_changes').addClass('d-none');
+            }
+            if (operation == '1') {
+                $('#create_new_card').removeClass('d-none');
+            } else {
+                $('#create_new_card').addClass('d-none');
+            }
+            if (operation == '4') {
+                $('#add_balance').removeClass('d-none');
+            } else {
+                $('#add_balance').addClass('d-none');
+            }
+            if (operation == '3') {
+                $('#delete_card').removeClass('d-none');
+            } else {
+                $('#delete_card').addClass('d-none');
+            }
+        });
+    </script>
+
 {% endblock %}

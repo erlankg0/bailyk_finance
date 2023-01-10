@@ -5,29 +5,29 @@
         <div class="container">
             <div class="row align-items-center">
                 <div class="col-lg-2 col-md-3 col-6">
-                    <a href="#" class="brand-wrap">
-                        <img class="logo" src="{% static 'images/logo.png' %}">
+                    <a href="{% url 'index' %}" class="brand-wrap">
+                        <img class="logo" src="{% static 'images/icons/new-logo.svg' %}">
                     </a> <!-- brand-wrap.// -->
                 </div>
                 <div class="col-lg col-sm col-md col-6 flex-grow-0">
                     <div class="category-wrap dropdown d-inline-block float-right">
                         <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown">
-                            <i class="fa fa-bars"></i> Категории
+                            <i class="fa fa-bars"></i> Операции
                         </button>
                         <ul class="dropdown-menu">
                             <li>
                                 <a class="dropdown-item"
-                                   href="#">Добавления карты
+                                   href="{% url 'create_person' %}">Добавления нового пользователя
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item"
-                                   href="#">Удаления карты
+                                   href="{% url 'create_card_select_person' %}">Добавления карты для пользователя
                                 </a>
                             </li>
                             <li>
                                 <a class="dropdown-item"
-                                   href="#">Редактирования карты
+                                   href="#">Удаления или редактирования карты пользователя
                                 </a>
                             </li>
                         </ul>

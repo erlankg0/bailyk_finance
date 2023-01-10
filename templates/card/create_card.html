@@ -1,0 +1,161 @@
+{% extends 'Base.html' %}
+{% block content %}
+    <section class="section-content padding-y bg">
+        <div class="container">
+            <!-- ============================ COMPONENT 1 ================================= -->
+            <div class="card">
+                <div class="row no-gutters">
+                    <aside class="col-md-6">
+
+
+                        <article class="content-body">
+                            {% if form.errors %}
+                                <div class="alert alert-danger">
+                                    {% for field in form %}
+                                        {% for error in field.errors %}
+                                            <p>{{ error }}</p>
+                                        {% endfor %}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <form class="mb-3" method="post">
+                                {% csrf_token %}
+                                <article class="content-body " id="create_new_card">
+                                    <h3 class="title">Владелец: {{ owner }}</h3>
+                                    <p class="mb-3 d-none">
+                                        <input type="text" class="form-control" name="owner"
+                                               id="id_owner" value="{{ owner.id }}">
+                                    </p>
+                                    <p class="mb-3">
+                                        <strong>
+                                            <label for="id_card_category" class="form-control-plaintext">
+                                                Тип карты
+                                            </label>
+                                        </strong>
+                                        <select class="form-control" name="card_category" id="id_cart_category">
+                                            <option value="credit" class="form-control">Кредитная карта</option>
+                                            <option value="debit" class="form-control">Дебетовая карта</option>
+                                            <option value="bonus" class="form-control">Бонусная карта</option>
+                                        </select>
+                                    </p>
+                                    <p class="mb-3">
+                                        <select class="form-control" name="payment_system" id="PAYMENT_SYSTEM">
+                                            <option value="visa" class="form-control">VISA</option>
+                                            <option value="mastercard" class="form-control">MasterCard</option>
+                                            <option value="american_express" class="form-control">American Express
+                                            </option>
+                                            <option value="mir" class="form-control">Мир</option>
+                                        </select>
+                                    </p>
+                                    <p class="mb-3">
+                                        <strong>Номер карты:</strong>
+                                        <input name="number" value="" class="form-control"
+                                               placeholder="Номер карты">
+                                    </p>
+                                    <p class="mb-3 d-none">
+                                        <input type="text" class="form-control" value="not_activated"
+                                               name="status"
+                                               id="id_status">
+                                    </p>
+                                    <p class="md-3 d-none">
+                                        <label for="id_amount d-none">Сумма:</label>
+                                        <input type="number" name="amount" value="0" step="0.01" required=""
+                                               id="id_amount">
+
+                                        <span class="helptext">Сумма должна быть больше 0</span>
+
+                                    </p>
+                                    <p class="md-3">
+                                        <strong>
+                                            <label class="form-control-plaintext" for="id_cvv">
+                                                CVV
+                                            </label>
+                                        </strong>
+
+                                        <input type="text" name="cvv" maxlength="3" id="id_cvv"
+                                               class="form-control">
+                                    </p>
+                                    <p>
+                                        <strong>
+                                            <label class="form-control-plaintext" for="id_pin">
+                                                PIN:
+                                            </label>
+                                        </strong>
+                                        <input type="text" name="pin" maxlength="4" id="id_pin"
+                                               class="form-control">
+                                    </p>
+                                    <button type="submit" class="btn btn-primary">Сохранить
+                                    </button>
+                                </article>
+                            </form>
+                        </article>
+                    </aside>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script>
+        $('#PAYMENT_SYSTEM').change(function () {
+            var payment_system = $(this).val();
+            // генерируем номер карты в зависимости от платежной системы и добавляем в поле card_number
+            if (payment_system == 'visa') {
+                var card_number = '4' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 4
+                $('input[name="number"]').val(card_number);
+            } else if (payment_system == 'mastercard') {
+                var card_number = '5' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 5
+                $('input[name="number"]').val(card_number);
+            } else if (payment_system == 'american_express') {
+                var card_number = '3' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 3
+                $('input[name="number"]').val(card_number);
+            } else if (payment_system == 'mir') {
+                var card_number = '2' + Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число и добавляем в начало 2
+                $('input[name="number"]').val(card_number);
+            }
+        });
+        $('#id_cart_category').change(function () {
+            var cart_category = $(this).val();
+            if (cart_category == 'bonus') {
+                $('#PAYMENT_SYSTEM').addClass('d-none');
+                var card_number = Math.floor(Math.random() * 1000000000000000); // генерируем 16-значное число
+                $('input[name="number"]').val(card_number);
+                $('input[name="cvv"]').addClass('d-none');
+                $('label[for="id_cvv"]').addClass('d-none');
+            } else {
+                $('#PAYMENT_SYSTEM').removeClass('d-none');
+                $('input[name="cvv"]').removeClass('d-none');
+                $('label[for="id_cvv"]').removeClass('d-none');
+                var cvv = Math.floor(Math.random() * 1000); // генерируем 3-значное число
+                $('input[name="cvv"]').val(cvv);
+                var pin = Math.floor(Math.random() * 10000); // генерируем 4-значное число
+                $('input[name="pin"]').val(pin);
+            }
+        });
+        $('#select_operation').change(function () {
+            var operation = $(this).val();
+            if (operation == '2') {
+                $('#choice_type_card').removeClass('d-none');
+                $('#select_status_card').removeClass('d-none');
+                $('#save_changes').removeClass('d-none');
+            } else {
+                $('#choice_type_card').addClass('d-none');
+                $('#select_status_card').addClass('d-none');
+                $('#save_changes').addClass('d-none');
+            }
+            if (operation == '1') {
+                $('#create_new_card').removeClass('d-none');
+            } else {
+                $('#create_new_card').addClass('d-none');
+            }
+            if (operation == '4') {
+                $('#add_balance').removeClass('d-none');
+            } else {
+                $('#add_balance').addClass('d-none');
+            }
+            if (operation == '3') {
+                $('#delete_card').removeClass('d-none');
+            } else {
+                $('#delete_card').addClass('d-none');
+            }
+        });
+    </script>
+{% endblock %}

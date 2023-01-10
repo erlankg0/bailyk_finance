@@ -9,9 +9,16 @@
                 <a href="#" class="btn btn-outline-primary float-right">See all</a>
                 <h3 class="section-title">Все карты</h3>
             </header><!-- sect-heading -->
+            {% if messages %}
 
+                <div class="alert alert-success" role="alert">
+                    {{ message }}
+                </div>
+
+            {% endif %}
 
             <div class="row">
+
                 {% for card in cards %}
                     <div class="col-md-3">
                         <div class="card card-product-grid">

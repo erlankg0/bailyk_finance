@@ -4,8 +4,6 @@ import re  # импортируем модуль для работы с регу
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
-from django.utils.text import slugify
-
 
 # Модель базы данных для карт и бонусных карт
 # Серия карты
@@ -19,6 +17,7 @@ from django.utils.text import slugify
 # Владелец карты
 # Имя
 # Фамилия
+from django.utils.text import slugify
 
 
 class Person(models.Model):
@@ -86,7 +85,9 @@ class Card(models.Model):
         max_length=20,
         verbose_name='Платежная система',
         choices=PAYMENT_SYSTEM_CHOICES,
-        help_text='Выберите платежную систему'
+        help_text='Выберите платежную систему',
+        blank=True,
+        null=True
     )
 
     # дата выуска карты
@@ -121,12 +122,16 @@ class Card(models.Model):
     cvv = models.CharField(
         max_length=3,
         verbose_name='CVV',
-        help_text='CVV должен состоять из 3 цифр'
+        help_text='CVV должен состоять из 3 цифр',
+        blank=True,
+        null=True
     )
     pin = models.CharField(
         max_length=4,
         verbose_name='PIN',
-        help_text='PIN должен состоять из 4 цифр'
+        help_text='PIN должен состоять из 4 цифр',
+        blank=True,
+        null=True
     )
     slug = models.SlugField(
         max_length=100,
@@ -135,9 +140,14 @@ class Card(models.Model):
         blank=True,
         null=True,
     )
+    deleted = models.BooleanField(
+        default=False,
+        verbose_name='Удаленная карта',
+        help_text='Инстина, если карта удалена'
+    )
 
     def get_absolute_url(self):
-        return reverse('card_detail', kwargs={'slug': self.slug})
+        return reverse('card_detail', kwargs={'slug': self.number})
 
     # баланс карты (сумма) не может быть меньше 0
     def clean(self):
@@ -168,11 +178,51 @@ class Card(models.Model):
 
     def __str__(self):
         if self.number is not None:
-            return self.number
+            # возвращает номер карты в формате 1234 5678 9012 3456
+            return '-'.join([self.number[i:i + 4] for i in range(0, 16, 4)])
         else:
             return 'Карта без номера'
+
+    def save(self, *args, **kwargs):
+        self.slug = slugify(self.number)
+        super(Card, self).save(*args, **kwargs)
 
     class Meta:
         verbose_name = 'Карта'
         verbose_name_plural = 'Карты'
         db_table = 'card'
+
+
+# модель для хранения истории операций с картами
+class CardHistory(models.Model):
+    card = models.ForeignKey(
+        Card,
+        on_delete=models.CASCADE,
+        verbose_name='Карта',
+        related_name='card_history',
+        blank=True,
+        null=True,
+    )
+    date = models.DateField(
+        verbose_name='Дата операции',
+        default=datetime.date.today,
+    )
+    amount = models.DecimalField(
+        max_digits=10,
+        decimal_places=2,
+        verbose_name='Сумма',
+    )
+    comment = models.CharField(
+        max_length=100,
+        verbose_name='Комментарий',
+        blank=True,
+        null=True,
+    )
+
+    def __str__(self):
+        return self.comment
+
+    class Meta:
+        verbose_name = 'История операций с картой'
+        verbose_name_plural = 'История операций с картами'
+        db_table = 'card_history'
