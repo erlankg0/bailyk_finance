@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 from card.forms import CardForm
-from card.models import Card, Person
+from card.models import Card, Person, CardHistory
 
 
 @admin.register(Person)
@@ -14,4 +14,7 @@ class CardAdmin(admin.ModelAdmin):
     form = CardForm
     prepopulated_fields = {'slug': ('number',)}
 
-# Register your models here.
+
+@admin.register(CardHistory)
+class CardHistoryAdmin(admin.ModelAdmin):
+    pass

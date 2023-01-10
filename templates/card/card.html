@@ -106,6 +106,7 @@
                                         <option value="2" class="form-control">Редактирования карты.</option>
                                         <option value="3" class="form-control">Удаления карты.</option>
                                         <option value="4" class="form-control">Пополнения балланса.</option>
+                                        <option value="5" class="form-control">Просмотра истории.</option>
                                     </select>
                                 </div>
                                 <a type="button" href="{% url 'create_card' card.owner.id %}">
@@ -122,20 +123,19 @@
             <br>
 
 
-            <div class="row d-none">
+            <div class="row d-none" id="history">
                 <div class="col-md-9">
 
                     <header class="section-heading">
-                        <h3>Customer Reviews </h3>
+                        <h3>История операций с картой </h3>
 
                     </header>
 
                     <article class="box mb-3">
                         <div class="icontext w-100">
-                            <img src="" class="img-xs icon rounded-circle">
                             <div class="text">
-                                <span class="date text-muted float-md-right">24.04.2020 </span>
-                                <h6 class="mb-1">Mike John </h6>
+                                <span class="date text-muted float-md-right"></span>
+                                <h6 class="mb-1">{{ card.owner }} </h6>
 
                             </div>
                         </div> <!-- icontext.// -->
@@ -217,6 +217,11 @@
                 $('#delete_card').removeClass('d-none');
             } else {
                 $('#delete_card').addClass('d-none');
+            }
+            if (operation == '5') {
+                $('#history').removeClass('d-none');
+            } else {
+                $('#history').addClass('d-none');
             }
         });
     </script>

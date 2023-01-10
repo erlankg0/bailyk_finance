@@ -5,6 +5,7 @@ from django.views.generic import ListView
 from django.contrib import messages
 from card.forms import CardForm, PersonForm
 from card.models import Card, Person, CardHistory
+from django.db.models import Q
 
 
 class CardListView(ListView):  # ListView by default
@@ -75,6 +76,27 @@ class CreatePersonView(CreateView):
         messages.success(self.request, 'Новый пользователь успешно создан')
         messages.error(self.request, 'Ошибка при создании ногового пользователя')
         return super().form_valid(form)
+
+
+class SearchCardView(ListView):
+    model = Card
+    template_name = 'card/index.html'
+    context_object_name = 'cards'
+
+    def get_queryset(self):
+        query = self.request.GET.get('q')
+        return Card.objects.filter(
+            Q(number__icontains=query) |
+            Q(owner__first_name__search=query) |
+            Q(owner__last_name__search=query) |
+            Q(owner__card__status__search=query)
+
+        )
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['query'] = self.request.GET.get('q')
+        return context
 
 
 # AJAXs

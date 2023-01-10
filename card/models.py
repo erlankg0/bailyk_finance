@@ -220,7 +220,7 @@ class CardHistory(models.Model):
     )
 
     def __str__(self):
-        return self.comment
+        return f'{self.card} {self.date} {self.amount}'
 
     class Meta:
         verbose_name = 'История операций с картой'
