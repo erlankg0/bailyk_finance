@@ -30,10 +30,11 @@
                             <form class="d-none" method="post" id="add_balance" action="{% url 'add_amount' %}">
                                 {% csrf_token %}
                                 <strong>Пополнить баланс:</strong>
-                                <input name="card_id" value="{{ card.slug }}" hidden>
+                                <input name="card_id" value="{{ card.number }}" hidden>
                                 <input type="number" name="amount" class="form-control">
+                                <input name="operation" type="text" value="add_balance" hidden>
                                 <br>
-                                <button type="submit" class="btn btn-primary " id="">Пополнить</button>
+                                <button type="submit" class="btn btn-primary " id="add_amount">Пополнить</button>
                             </form>
 
                             </p>
@@ -47,7 +48,7 @@
 
                                     <div class="item-option-select">
                                         <h6>Изменить типа карты</h6>
-                                        <select class="form-control" name="card_type">
+                                        <select class="form-control" name="card_type" id="id_category">
                                             <option value="0" class="form-control">Выбор типа карты</option>
                                             <option value="credit" class="form-control">Кредитная карта</option>
                                             <option value="debit" class="form-control">Дебетовая карта</option>
@@ -58,13 +59,15 @@
                                 <div class="mb-3 d-none" id="select_status_card">
                                     <div class="item-option-select">
                                         <h6>Изменить статус карты</h6>
-                                        <select class="form-control" name="card_status">
+                                        <select class="form-control" name="card_status" id="id_status">
                                             <option value="0" class="form-control">Выбор статуса карты</option>
                                             <option value="activated" class="form-control">Активирована</option>
                                             <option value="not_activated" class="form-control">Не активирована</option>
                                             <option value="expired" class="form-control">Заблокирована/Просрочена
                                             </option>
                                         </select>
+                                        <input name="operation" type="text" value="chance_status_or_category" hidden>
+                                        <input hidden value="{{ card.number }}" type="text" id="id_card">
                                     </div>
                                 </div>
                                 <button type="submit" class="btn btn-primary d-none" id="save_changes">Сохранить
@@ -82,7 +85,8 @@
                             </p>
                             <form action="{% url 'delete_card' %}" method="post">
                                 {% csrf_token %}
-                                <input name="card_id" value="{{ card.slug }}" hidden>
+                                <input name="card_id" value="{{ card.number }}" hidden>
+                                <input name="operation" type="text" value="delete_card" hidden>
                                 <button type="submit" class="btn btn-danger d-none" id="delete_card">Удалить карту
                                 </button>
                             </form>
@@ -136,15 +140,14 @@
                             <div class="text">
                                 <span class="date text-muted float-md-right"></span>
                                 <h6 class="mb-1">{{ card.owner }} </h6>
-
                             </div>
                         </div> <!-- icontext.// -->
                         <div class="mt-3">
-                            <p>
-                                Dummy comment Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod
-                                tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam,
-                                quis nostrud exercitation ullamco laboris nisi ut aliquip
-                            </p>
+                            {% for history in card.card_history.all %}
+                                <p>
+                                    {{ history }}
+                                </p>
+                            {% endfor %}
                         </div>
                     </article>
 
@@ -223,6 +226,56 @@
             } else {
                 $('#history').addClass('d-none');
             }
+        });
+        // send post with ajax where id is add_amount
+        $('#add_amount').click(function () {            
+            var amount = $('input[name="amount"]').val();
+            var card_id = $('#id_card').val();
+            var operation = $('input[name="operation"]').val();
+            var csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]').val();
+            $.ajax({
+                type: 'POST',
+                url: '/add_history/',
+                data: {
+                    'operation': operation,
+                    'amount': amount,
+                    'card_id': card_id,
+                    'csrfmiddlewaretoken': csrfmiddlewaretoken
+                },
+            });
+        });
+        // sent post with ajax where id is save_changes
+        $('#save_changes').click(function () {
+            var card_id = $('#id_card').val();
+            var status = $('#id_status').val();
+            var card_type = $('#id_category').val();
+            var operation = $('input[name="operation"]').val();
+            var csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]').val();
+            $.ajax({
+                type: 'POST',
+                url: '/add_history/',
+                data: {
+                    'card_id': card_id,
+                    'status': status,
+                    'card_type': card_type,
+                    'csrfmiddlewaretoken': csrfmiddlewaretoken
+                },
+            });
+        });
+        // sent post with ajax where id is delete_card
+        $('#delete_card').click(function () {
+            var card_id = $('#id_card').val();
+            var operation = $('input[name="operation"]').val();
+            var csrfmiddlewaretoken = $('input[name="csrfmiddlewaretoken"]').val();
+            $.ajax({
+                type: 'POST',
+                url: '/add_history/',
+                data: {
+                    'card_id': card_id,
+                    'operation': operation,
+                    'csrfmiddlewaretoken': csrfmiddlewaretoken
+                },
+            });
         });
     </script>
 

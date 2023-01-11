@@ -25,22 +25,14 @@
                                    href="{% url 'create_card_select_person' %}">Добавления карты для пользователя
                                 </a>
                             </li>
-                            <li>
-                                <a class="dropdown-item"
-                                   href="#">Удаления или редактирования карты пользователя
-                                </a>
-                            </li>
                         </ul>
                     </div>  <!-- category-wrap.// -->
                 </div> <!-- col.// -->
                 <div class="col-lg  col-md-6 col-sm-12 col">
-                    <form action="#" class="search" method="get">
+                    <form action="{% url 'search' %}" class="search" method="get">
                         <div class="input-group w-100">
                             {% csrf_token %}
-
-                            <input type="search" class="form-control" style="width:60%;" placeholder="Search" name="q">
-
-
+                            <input type="search" class="form-control" style="width:60%;" placeholder="Поиск" name="q">
                             <div class="input-group-append">
                                 <button class="btn btn-primary" type="submit">
                                     <i class="fa fa-search"></i>

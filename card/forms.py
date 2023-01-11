@@ -1,6 +1,6 @@
 from django.forms import ModelForm
 
-from card.models import Card, Person
+from card.models import Card, Person, CardHistory
 from card.utils import generate_card_number
 
 
@@ -24,3 +24,12 @@ class PersonForm(ModelForm):
     class Meta:
         model = Person
         fields = ('first_name', 'last_name',)
+
+
+class CardHistoryForm(ModelForm):
+    class Meta:
+        model = CardHistory
+        fields = "__all__"
+
+
+

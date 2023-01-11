@@ -4,6 +4,11 @@ import re  # импортируем модуль для работы с регу
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.urls import reverse
+# Владелец карты
+# Имя
+# Фамилия
+from django.utils.text import slugify
+
 
 # Модель базы данных для карт и бонусных карт
 # Серия карты
@@ -13,11 +18,6 @@ from django.urls import reverse
 # дата использованияД
 # сумма
 # статус карты (не активирована, активирована, просрочена)
-
-# Владелец карты
-# Имя
-# Фамилия
-from django.utils.text import slugify
 
 
 class Person(models.Model):
@@ -211,16 +211,18 @@ class CardHistory(models.Model):
         max_digits=10,
         decimal_places=2,
         verbose_name='Сумма',
-    )
-    comment = models.CharField(
-        max_length=100,
-        verbose_name='Комментарий',
-        blank=True,
         null=True,
+        blank=True,
+    )
+    operation_type = models.CharField(
+        max_length=50,
+        verbose_name="Тип операции",
+        null=True,
+        blank=True,
     )
 
     def __str__(self):
-        return f'{self.card} {self.date} {self.amount}'
+        return f'{self.operation_type} {self.amount}'
 
     class Meta:
         verbose_name = 'История операций с картой'
