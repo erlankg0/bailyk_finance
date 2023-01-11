@@ -215,7 +215,7 @@ class CardHistory(models.Model):
         blank=True,
     )
     operation_type = models.CharField(
-        max_length=50,
+        max_length=500,
         verbose_name="Тип операции",
         null=True,
         blank=True,

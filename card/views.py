@@ -1,3 +1,5 @@
+import datetime
+
 from django.contrib import messages
 from django.db.models import Q
 from django.http import JsonResponse
@@ -106,12 +108,6 @@ class SearchCardView(ListView):
         return object_list
 
 
-class CardHistories(CreateView):
-    form_class = CardHistoryForm
-    template_name = 'card/history.html'
-    success_url = '/'
-
-
 def check_operation(operation):
     if operation == 'add_balance':
         return 'Пополнения баланса'
@@ -130,14 +126,14 @@ def add_to_history(request):
         if current_operation != "Пополнения баланса":
             card_history = CardHistory.objects.create(
                 card=card,
-                operation_type=current_operation
+                operation_type=f'{datetime.datetime.today().strftime("%Y-%m-%d %H:%M")} {current_operation}'
             )
             card_history.save()
         else:
             card_history = CardHistory.objects.create(
                 card=card,
                 amount=request.POST.get('amount'),
-                operation_type=current_operation
+                operation_type=f'{datetime.datetime.today().strftime("%Y-%m-%d %H:%M")} {current_operation}'
             )
             card_history.save()
         return redirect('card_detail', slug=card.slug)
