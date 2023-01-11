@@ -1,5 +1,6 @@
 import datetime
 import re  # импортируем модуль для работы с регулярными выражениями
+import random  # импортируем модуль для работы с рандомными числами
 
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -8,7 +9,7 @@ from django.urls import reverse
 # Имя
 # Фамилия
 from django.utils.text import slugify
-
+from django.contrib import messages
 
 # Модель базы данных для карт и бонусных карт
 # Серия карты
@@ -98,7 +99,8 @@ class Card(models.Model):
     # дата окончания действия карты (годен 4 год)
     date_of_expiry = models.DateField(
         verbose_name='Дата окончания действия карты',
-        auto_now_add=True,
+        blank=True,
+        null=True
     )
     # дата использования карты при покупке
     date_of_use = models.DateField(
@@ -184,6 +186,14 @@ class Card(models.Model):
             return 'Карта без номера'
 
     def save(self, *args, **kwargs):
+        # рандомно дать дату окончания действия карты "1 год", "6 месяцев" или "3 месяца" от текущей даты 
+        self.date_of_expiry = datetime.date.today() + datetime.timedelta(days=random.randint(90, 365))
+        # после окончания действия карты, deleted=True, карта удаляется из базы данных 
+        if self.date_of_expiry < datetime.date.today():
+            self.deleted = True
+        # если deleted=True, то дата использования статус карты будет просрочена или date of expiry истекла
+        if self.deleted or self.date_of_expiry < datetime.date.today():
+            self.status = 'expired'
         self.slug = slugify(self.number)
         super(Card, self).save(*args, **kwargs)
 

@@ -11,6 +11,7 @@ class CardForm(ModelForm):
         self.fields['number'].initial = str(
             generate_card_number())  # автоматически добавляет номер карты на поле number (для карт) или (для бонусных карт)
         # циклом перебираем все поля и добавляем классы в Label
+        self.fields['status'].initial = "not_activated"
         for field_name, field in self.fields.items():
             field.widget.attrs['class'] = 'form-control'
             field.help_text = ''

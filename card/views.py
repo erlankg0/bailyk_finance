@@ -150,6 +150,10 @@ def is_ajax(request):  # проверка на ajax запрос
 def add_amount(request):
     if request.method == 'POST':
         card = Card.objects.get(slug=request.POST.get('card_id'))
+        if card.status == 'expired':
+            message = 'Карта с номером {} просрочена'.format(card.number)
+            messages.WARNING(message)
+            redirect('card_detail', slug=card.slug)
         card.amount += int(request.POST.get('amount'))
         card.save()
         return redirect('card_detail', slug=card.slug)

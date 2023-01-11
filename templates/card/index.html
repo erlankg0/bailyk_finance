@@ -43,13 +43,15 @@
                                                             <p class="data-validade-cartao-front">{{ card.date_of_expiry }}</p>
                                                         </div>
                                                     </label>
-                                                    <hr>
-                                                    <label class="w-48">
-                                                        <span>CVV</span>
-                                                        <div class="input-area">
-                                                            <p class="cvv-front">{{ card.cvv }}</p>
-                                                        </div>
-                                                    </label>
+                                                    {% if card.card_category != 'bonus' %}
+                                                        <hr>
+                                                        <label class="w-48">
+                                                            <span>CVV</span>
+                                                            <div class="input-area">
+                                                                <p class="cvv-front">{{ card.cvv }}</p>
+                                                            </div>
+                                                        </label>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>

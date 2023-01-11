@@ -8,6 +8,11 @@
             <div class="card">
                 <div class="row no-gutters">
                     <aside class="col-md-6">
+                        {% if message %}
+                            <div class="alert alert-success" role="alert">
+                                {{ message }}
+                            </div>
+                        {% endif %}
                         <article class="content-body">
 
                             <p class="mb-3">
